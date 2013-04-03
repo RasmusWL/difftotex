@@ -1,0 +1,408 @@
+
+% +-----------------------------------------------------+
+% |   You must include the following in your preamble   |
+% +-----------------------------------------------------+
+% \usepackage{array}
+% \usepackage{tabu}
+% \usepackage{longtable}
+% \usepackage[table]{xcolor}
+% +-----------------------------------------------------+
+% |                         end                         |
+% +-----------------------------------------------------+
+
+\definecolor{DiffInsertRGB}{RGB}{221,255,221}
+\definecolor{DiffDeleteRGB}{RGB}{255,221,221}
+\definecolor{DiffLineNumber}{RGB}{170,170,170}
+
+\subsection{src/common.h\label{sub:src/common.h}}
+
+{\ttfamily\scriptsize
+
+\begin{longtabu} to \linewidth {|>{\color{DiffLineNumber}}r|>{\color{DiffLineNumber}}r|X|}
+
+\hline
+
+... & ... & \textcolor{DiffLineNumber}{@@\ -29,9\ +29,10\ @@} \tabularnewline
+29 & 29 & \ \#\ include\ \char`"\{\}win32/msvc-compat.h\char`"\{\} \tabularnewline
+30 & 30 & \ \#\ include\ \char`"\{\}win32/mingw-compat.h\char`"\{\} \tabularnewline
+31 & 31 & \ \#\ include\ \char`"\{\}win32/error.h\char`"\{\} \tabularnewline
+& 32 & \cellcolor{DiffInsertRGB} +\#\ include\ \char`"\{\}win32/version.h\char`"\{\} \tabularnewline
+32 & 33 & \ \#\ ifdef\ GIT\_THREADS \tabularnewline
+33 & 34 & \ \#	include\ \char`"\{\}win32/pthread.h\char`"\{\} \tabularnewline
+34 & & \cellcolor{DiffDeleteRGB} -\#endif \tabularnewline
+& 35 & \cellcolor{DiffInsertRGB} +\#\ endif \tabularnewline
+35 & 36 & \  \tabularnewline
+36 & 37 & \ \#else \tabularnewline
+37 & 38 & \  \tabularnewline
+
+\hline
+\end{longtabu}
+}
+
+\subsection{src/transports/winhttp.c\label{sub:src/transports/winhttp.c}}
+
+{\ttfamily\scriptsize
+
+\begin{longtabu} to \linewidth {|>{\color{DiffLineNumber}}r|>{\color{DiffLineNumber}}r|X|}
+
+\hline
+
+... & ... & \textcolor{DiffLineNumber}{@@\ -58,6\ +58,7\ @@\ typedef\ struct\ \{} \tabularnewline
+58 & 58 & \ 	const\ char\ *service\_url; \tabularnewline
+59 & 59 & \ 	const\ wchar\_t\ *verb; \tabularnewline
+60 & 60 & \ 	HINTERNET\ request; \tabularnewline
+& 61 & \cellcolor{DiffInsertRGB} +	wchar\_t\ *request\_uri; \tabularnewline
+61 & 62 & \ 	char\ *chunk\_buffer; \tabularnewline
+62 & 63 & \ 	unsigned\ chunk\_buffer\_len; \tabularnewline
+63 & 64 & \ 	HANDLE\ post\_body; \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -145,10\ +146,10\ @@\ static\ int\ winhttp\_stream\_connect(winhttp\_stream\ *s)} \tabularnewline
+145 & 146 & \ 	winhttp\_subtransport\ *t\ =\ OWNING\_SUBTRANSPORT(s); \tabularnewline
+146 & 147 & \ 	git\_buf\ buf\ =\ GIT\_BUF\_INIT; \tabularnewline
+147 & 148 & \ 	char\ *proxy\_url\ =\ NULL; \tabularnewline
+148 & & \cellcolor{DiffDeleteRGB} -	wchar\_t\ url[GIT\_WIN\_PATH],\ ct[MAX\_CONTENT\_TYPE\_LEN]; \tabularnewline
+& 149 & \cellcolor{DiffInsertRGB} +	wchar\_t\ ct[MAX\_CONTENT\_TYPE\_LEN]; \tabularnewline
+149 & 150 & \ 	wchar\_t\ *types[]\ =\ \{\ L\char`"\{\}*/*\char`"\{\},\ NULL\ \}; \tabularnewline
+150 & 151 & \ 	BOOL\ peerdist\ =\ FALSE; \tabularnewline
+151 & & \cellcolor{DiffDeleteRGB} -	int\ error\ =\ -1; \tabularnewline
+& 152 & \cellcolor{DiffInsertRGB} +	int\ error\ =\ -1,\ wide\_len; \tabularnewline
+152 & 153 & \  \tabularnewline
+153 & 154 & \ 	/*\ Prepare\ URL\ */ \tabularnewline
+154 & 155 & \ 	git\_buf\_printf(\&buf,\ \char`"\{\}\%s\%s\char`"\{\},\ t->path,\ s->service\_url); \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -156,13\ +157,31\ @@\ static\ int\ winhttp\_stream\_connect(winhttp\_stream\ *s)} \tabularnewline
+156 & 157 & \ 	if\ (git\_buf\_oom(\&buf)) \tabularnewline
+157 & 158 & \ 		return\ -1; \tabularnewline
+158 & 159 & \  \tabularnewline
+159 & & \cellcolor{DiffDeleteRGB} -	git\_\_utf8\_to\_16(url,\ GIT\_WIN\_PATH,\ git\_buf\_cstr(\&buf)); \tabularnewline
+& 160 & \cellcolor{DiffInsertRGB} +	/*\ Convert\ URL\ to\ wide\ characters\ */ \tabularnewline
+& 161 & \cellcolor{DiffInsertRGB} +	wide\_len\ =\ MultiByteToWideChar(CP\_UTF8,	MB\_ERR\_INVALID\_CHARS, \tabularnewline
+& 162 & \cellcolor{DiffInsertRGB} +		git\_buf\_cstr(\&buf),	-1,\ NULL,\ 0); \tabularnewline
+& 163 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 164 & \cellcolor{DiffInsertRGB} +	if\ (!wide\_len)\ \{ \tabularnewline
+& 165 & \cellcolor{DiffInsertRGB} +		giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ measure\ string\ for\ wide\ conversion\char`"\{\}); \tabularnewline
+& 166 & \cellcolor{DiffInsertRGB} +		goto\ on\_error; \tabularnewline
+& 167 & \cellcolor{DiffInsertRGB} +	\} \tabularnewline
+& 168 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 169 & \cellcolor{DiffInsertRGB} +	s->request\_uri\ =\ git\_\_malloc(wide\_len\ *\ sizeof(wchar\_t)); \tabularnewline
+& 170 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 171 & \cellcolor{DiffInsertRGB} +	if\ (!s->request\_uri) \tabularnewline
+& 172 & \cellcolor{DiffInsertRGB} +		goto\ on\_error; \tabularnewline
+& 173 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 174 & \cellcolor{DiffInsertRGB} +	if\ (!MultiByteToWideChar(CP\_UTF8,\ MB\_ERR\_INVALID\_CHARS, \tabularnewline
+& 175 & \cellcolor{DiffInsertRGB} +		git\_buf\_cstr(\&buf),\ -1,\ s->request\_uri,\ wide\_len))\ \{ \tabularnewline
+& 176 & \cellcolor{DiffInsertRGB} +		giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ convert\ string\ to\ wide\ form\char`"\{\}); \tabularnewline
+& 177 & \cellcolor{DiffInsertRGB} +		goto\ on\_error; \tabularnewline
+& 178 & \cellcolor{DiffInsertRGB} +	\} \tabularnewline
+160 & 179 & \  \tabularnewline
+161 & 180 & \ 	/*\ Establish\ request\ */ \tabularnewline
+162 & 181 & \ 	s->request\ =\ WinHttpOpenRequest( \tabularnewline
+163 & 182 & \ 			t->connection, \tabularnewline
+164 & 183 & \ 			s->verb, \tabularnewline
+165 & & \cellcolor{DiffDeleteRGB} -			url, \tabularnewline
+& 184 & \cellcolor{DiffInsertRGB} +			s->request\_uri, \tabularnewline
+166 & 185 & \ 			NULL, \tabularnewline
+167 & 186 & \ 			WINHTTP\_NO\_REFERER, \tabularnewline
+168 & 187 & \ 			types, \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -179,19\ +198,36\ @@\ static\ int\ winhttp\_stream\_connect(winhttp\_stream\ *s)} \tabularnewline
+179 & 198 & \  \tabularnewline
+180 & 199 & \ 	if\ (proxy\_url)\ \{ \tabularnewline
+181 & 200 & \ 		WINHTTP\_PROXY\_INFO\ proxy\_info; \tabularnewline
+182 & & \cellcolor{DiffDeleteRGB} -		size\_t\ wide\_len; \tabularnewline
+& 201 & \cellcolor{DiffInsertRGB} +		wchar\_t\ *proxy\_wide; \tabularnewline
+& 202 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 203 & \cellcolor{DiffInsertRGB} +		/*\ Convert\ URL\ to\ wide\ characters\ */ \tabularnewline
+& 204 & \cellcolor{DiffInsertRGB} +		wide\_len\ =\ MultiByteToWideChar(CP\_UTF8,	MB\_ERR\_INVALID\_CHARS, \tabularnewline
+& 205 & \cellcolor{DiffInsertRGB} +			proxy\_url,\ -1,\ NULL,\ 0); \tabularnewline
+183 & 206 & \  \tabularnewline
+184 & & \cellcolor{DiffDeleteRGB} -		git\_\_utf8\_to\_16(url,\ GIT\_WIN\_PATH,\ proxy\_url); \tabularnewline
+& 207 & \cellcolor{DiffInsertRGB} +		if\ (!wide\_len)\ \{ \tabularnewline
+& 208 & \cellcolor{DiffInsertRGB} +			giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ measure\ string\ for\ wide\ conversion\char`"\{\}); \tabularnewline
+& 209 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+& 210 & \cellcolor{DiffInsertRGB} +		\} \tabularnewline
+185 & 211 & \  \tabularnewline
+186 & & \cellcolor{DiffDeleteRGB} -		wide\_len\ =\ wcslen(url); \tabularnewline
+& 212 & \cellcolor{DiffInsertRGB} +		proxy\_wide\ =\ git\_\_malloc(wide\_len\ *\ sizeof(wchar\_t)); \tabularnewline
+& 213 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 214 & \cellcolor{DiffInsertRGB} +		if\ (!proxy\_wide) \tabularnewline
+& 215 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+& 216 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 217 & \cellcolor{DiffInsertRGB} +		if\ (!MultiByteToWideChar(CP\_UTF8,\ MB\_ERR\_INVALID\_CHARS, \tabularnewline
+& 218 & \cellcolor{DiffInsertRGB} +			proxy\_url,\ -1,\ proxy\_wide,\ wide\_len))\ \{ \tabularnewline
+& 219 & \cellcolor{DiffInsertRGB} +			giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ convert\ string\ to\ wide\ form\char`"\{\}); \tabularnewline
+& 220 & \cellcolor{DiffInsertRGB} +			git\_\_free(proxy\_wide); \tabularnewline
+& 221 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+& 222 & \cellcolor{DiffInsertRGB} +		\} \tabularnewline
+187 & 223 & \  \tabularnewline
+188 & 224 & \ 		/*\ Strip\ any\ trailing\ forward\ slash\ on\ the\ proxy\ URL; \tabularnewline
+189 & 225 & \ 		\ *\ WinHTTP\ doesn't\ like\ it\ if\ one\ is\ present\ */ \tabularnewline
+190 & & \cellcolor{DiffDeleteRGB} -		if\ (L'/'\ ==\ url[wide\_len\ -\ 1]) \tabularnewline
+191 & & \cellcolor{DiffDeleteRGB} -			url[wide\_len\ -\ 1]\ =\ L'\textbackslash 0'; \tabularnewline
+& 226 & \cellcolor{DiffInsertRGB} +		if\ (wide\_len\ >\ 1\ \&\&\ L'/'\ ==\ proxy\_wide[wide\_len\ -\ 2]) \tabularnewline
+& 227 & \cellcolor{DiffInsertRGB} +			proxy\_wide[wide\_len\ -\ 2]\ =\ L'\textbackslash 0'; \tabularnewline
+192 & 228 & \  \tabularnewline
+193 & 229 & \ 		proxy\_info.dwAccessType\ =\ WINHTTP\_ACCESS\_TYPE\_NAMED\_PROXY; \tabularnewline
+194 & & \cellcolor{DiffDeleteRGB} -		proxy\_info.lpszProxy\ =\ url; \tabularnewline
+& 230 & \cellcolor{DiffInsertRGB} +		proxy\_info.lpszProxy\ =\ proxy\_wide; \tabularnewline
+195 & 231 & \ 		proxy\_info.lpszProxyBypass\ =\ NULL; \tabularnewline
+196 & 232 & \  \tabularnewline
+197 & 233 & \ 		if\ (!WinHttpSetOption(s->request, \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -199,8\ +235,11\ @@\ static\ int\ winhttp\_stream\_connect(winhttp\_stream\ *s)} \tabularnewline
+199 & 235 & \ 			\&proxy\_info, \tabularnewline
+200 & 236 & \ 			sizeof(WINHTTP\_PROXY\_INFO)))\ \{ \tabularnewline
+201 & 237 & \ 			giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ set\ proxy\char`"\{\}); \tabularnewline
+& 238 & \cellcolor{DiffInsertRGB} +			git\_\_free(proxy\_wide); \tabularnewline
+202 & 239 & \ 			goto\ on\_error; \tabularnewline
+203 & 240 & \ 		\} \tabularnewline
+& 241 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 242 & \cellcolor{DiffInsertRGB} +		git\_\_free(proxy\_wide); \tabularnewline
+204 & 243 & \ 	\} \tabularnewline
+205 & 244 & \  \tabularnewline
+206 & 245 & \ 	/*\ Strip\ unwanted\ headers\ (X-P2P-PeerDist,\ X-P2P-PeerDistEx)\ that\ WinHTTP \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -348,8\ +387,15\ @@\ static\ int\ winhttp\_stream\_read(} \tabularnewline
+348 & 387 & \ 	winhttp\_stream\ *s\ =\ (winhttp\_stream\ *)stream; \tabularnewline
+349 & 388 & \ 	winhttp\_subtransport\ *t\ =\ OWNING\_SUBTRANSPORT(s); \tabularnewline
+350 & 389 & \ 	DWORD\ dw\_bytes\_read; \tabularnewline
+& 390 & \cellcolor{DiffInsertRGB} +	char\ replay\_count\ =\ 0; \tabularnewline
+351 & 391 & \  \tabularnewline
+352 & 392 & \ replay: \tabularnewline
+& 393 & \cellcolor{DiffInsertRGB} +	/*\ Enforce\ a\ reasonable\ cap\ on\ the\ number\ of\ replays\ */ \tabularnewline
+& 394 & \cellcolor{DiffInsertRGB} +	if\ (++replay\_count\ >=\ 7)\ \{ \tabularnewline
+& 395 & \cellcolor{DiffInsertRGB} +		giterr\_set(GITERR\_NET,\ \char`"\{\}Too\ many\ redirects\ or\ authentication\ replays\char`"\{\}); \tabularnewline
+& 396 & \cellcolor{DiffInsertRGB} +		return\ -1; \tabularnewline
+& 397 & \cellcolor{DiffInsertRGB} +	\} \tabularnewline
+& 398 & \cellcolor{DiffInsertRGB} + \tabularnewline
+353 & 399 & \ 	/*\ Connect\ if\ necessary\ */ \tabularnewline
+354 & 400 & \ 	if\ (!s->request\ \&\&\ winhttp\_stream\_connect(s)\ <\ 0) \tabularnewline
+355 & 401 & \ 		return\ -1; \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -445,10\ +491,70\ @@\ replay:} \tabularnewline
+445 & 491 & \ 			WINHTTP\_HEADER\_NAME\_BY\_INDEX, \tabularnewline
+446 & 492 & \ 			\&status\_code,\ \&status\_code\_length, \tabularnewline
+447 & 493 & \ 			WINHTTP\_NO\_HEADER\_INDEX))\ \{ \tabularnewline
+448 & & \cellcolor{DiffDeleteRGB} -				giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ retreive\ status\ code\char`"\{\}); \tabularnewline
+& 494 & \cellcolor{DiffInsertRGB} +				giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ retrieve\ status\ code\char`"\{\}); \tabularnewline
+449 & 495 & \ 				return\ -1; \tabularnewline
+450 & 496 & \ 		\} \tabularnewline
+451 & 497 & \  \tabularnewline
+& 498 & \cellcolor{DiffInsertRGB} +		/*\ The\ implementation\ of\ WinHTTP\ prior\ to\ Windows\ 7\ will\ not \tabularnewline
+& 499 & \cellcolor{DiffInsertRGB} +		\ *\ redirect\ to\ an\ identical\ URI.\ Some\ Git\ hosters\ use\ self-redirects \tabularnewline
+& 500 & \cellcolor{DiffInsertRGB} +		\ *\ as\ part\ of\ their\ DoS\ mitigation\ strategy.\ Check\ first\ to\ see\ if\ we \tabularnewline
+& 501 & \cellcolor{DiffInsertRGB} +		\ *\ have\ a\ redirect\ status\ code,\ and\ that\ we\ haven't\ already\ streamed \tabularnewline
+& 502 & \cellcolor{DiffInsertRGB} +		\ *\ a\ post\ body.\ (We\ can't\ replay\ a\ streamed\ POST.)\ */ \tabularnewline
+& 503 & \cellcolor{DiffInsertRGB} +		if\ (!s->chunked\ \&\& \tabularnewline
+& 504 & \cellcolor{DiffInsertRGB} +			(HTTP\_STATUS\_MOVED\ ==\ status\_code\ || \tabularnewline
+& 505 & \cellcolor{DiffInsertRGB} +			\ HTTP\_STATUS\_REDIRECT\ ==\ status\_code\ || \tabularnewline
+& 506 & \cellcolor{DiffInsertRGB} +			\ (HTTP\_STATUS\_REDIRECT\_METHOD\ ==\ status\_code\ \&\& \tabularnewline
+& 507 & \cellcolor{DiffInsertRGB} +			\ \ get\_verb\ ==\ s->verb)\ || \tabularnewline
+& 508 & \cellcolor{DiffInsertRGB} +			\ HTTP\_STATUS\_REDIRECT\_KEEP\_VERB\ ==\ status\_code))\ \{ \tabularnewline
+& 509 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 510 & \cellcolor{DiffInsertRGB} +			/*\ Check\ for\ Windows\ 7.\ This\ workaround\ is\ only\ necessary\ on \tabularnewline
+& 511 & \cellcolor{DiffInsertRGB} +			\ *\ Windows\ Vista\ and\ earlier.\ Windows\ 7\ is\ version\ 6.1.\ */ \tabularnewline
+& 512 & \cellcolor{DiffInsertRGB} +			if\ (!git\_has\_win32\_version(6,\ 1))\ \{ \tabularnewline
+& 513 & \cellcolor{DiffInsertRGB} +				wchar\_t\ *location; \tabularnewline
+& 514 & \cellcolor{DiffInsertRGB} +				DWORD\ location\_length; \tabularnewline
+& 515 & \cellcolor{DiffInsertRGB} +				int\ redirect\_cmp; \tabularnewline
+& 516 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 517 & \cellcolor{DiffInsertRGB} +				/*\ OK,\ fetch\ the\ Location\ header\ from\ the\ redirect.\ */ \tabularnewline
+& 518 & \cellcolor{DiffInsertRGB} +				if\ (WinHttpQueryHeaders(s->request, \tabularnewline
+& 519 & \cellcolor{DiffInsertRGB} +					WINHTTP\_QUERY\_LOCATION, \tabularnewline
+& 520 & \cellcolor{DiffInsertRGB} +					WINHTTP\_HEADER\_NAME\_BY\_INDEX, \tabularnewline
+& 521 & \cellcolor{DiffInsertRGB} +					WINHTTP\_NO\_OUTPUT\_BUFFER, \tabularnewline
+& 522 & \cellcolor{DiffInsertRGB} +					\&location\_length, \tabularnewline
+& 523 & \cellcolor{DiffInsertRGB} +					WINHTTP\_NO\_HEADER\_INDEX)\ || \tabularnewline
+& 524 & \cellcolor{DiffInsertRGB} +					GetLastError()\ !=\ ERROR\_INSUFFICIENT\_BUFFER)\ \{ \tabularnewline
+& 525 & \cellcolor{DiffInsertRGB} +					giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ read\ Location\ header\char`"\{\}); \tabularnewline
+& 526 & \cellcolor{DiffInsertRGB} +					return\ -1; \tabularnewline
+& 527 & \cellcolor{DiffInsertRGB} +				\} \tabularnewline
+& 528 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 529 & \cellcolor{DiffInsertRGB} +				location\ =\ git\_\_malloc(location\_length); \tabularnewline
+& 530 & \cellcolor{DiffInsertRGB} +				GITERR\_CHECK\_ALLOC(location); \tabularnewline
+& 531 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 532 & \cellcolor{DiffInsertRGB} +				if\ (!WinHttpQueryHeaders(s->request, \tabularnewline
+& 533 & \cellcolor{DiffInsertRGB} +					WINHTTP\_QUERY\_LOCATION, \tabularnewline
+& 534 & \cellcolor{DiffInsertRGB} +					WINHTTP\_HEADER\_NAME\_BY\_INDEX, \tabularnewline
+& 535 & \cellcolor{DiffInsertRGB} +					location, \tabularnewline
+& 536 & \cellcolor{DiffInsertRGB} +					\&location\_length, \tabularnewline
+& 537 & \cellcolor{DiffInsertRGB} +					WINHTTP\_NO\_HEADER\_INDEX))\ \{ \tabularnewline
+& 538 & \cellcolor{DiffInsertRGB} +					giterr\_set(GITERR\_OS,\ \char`"\{\}Failed\ to\ read\ Location\ header\char`"\{\}); \tabularnewline
+& 539 & \cellcolor{DiffInsertRGB} +					git\_\_free(location); \tabularnewline
+& 540 & \cellcolor{DiffInsertRGB} +					return\ -1; \tabularnewline
+& 541 & \cellcolor{DiffInsertRGB} +				\} \tabularnewline
+& 542 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 543 & \cellcolor{DiffInsertRGB} +				/*\ Compare\ the\ Location\ header\ with\ the\ request\ URI\ */ \tabularnewline
+& 544 & \cellcolor{DiffInsertRGB} +				redirect\_cmp\ =\ wcscmp(location,\ s->request\_uri); \tabularnewline
+& 545 & \cellcolor{DiffInsertRGB} +				git\_\_free(location); \tabularnewline
+& 546 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 547 & \cellcolor{DiffInsertRGB} +				if\ (!redirect\_cmp)\ \{ \tabularnewline
+& 548 & \cellcolor{DiffInsertRGB} +					/*\ Replay\ the\ request\ */ \tabularnewline
+& 549 & \cellcolor{DiffInsertRGB} +					WinHttpCloseHandle(s->request); \tabularnewline
+& 550 & \cellcolor{DiffInsertRGB} +					s->request\ =\ NULL; \tabularnewline
+& 551 & \cellcolor{DiffInsertRGB} +					s->sent\_request\ =\ 0; \tabularnewline
+& 552 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 553 & \cellcolor{DiffInsertRGB} +					goto\ replay; \tabularnewline
+& 554 & \cellcolor{DiffInsertRGB} +				\} \tabularnewline
+& 555 & \cellcolor{DiffInsertRGB} +			\} \tabularnewline
+& 556 & \cellcolor{DiffInsertRGB} +		\} \tabularnewline
+& 557 & \cellcolor{DiffInsertRGB} + \tabularnewline
+452 & 558 & \ 		/*\ Handle\ authentication\ failures\ */ \tabularnewline
+453 & 559 & \ 		if\ (HTTP\_STATUS\_DENIED\ ==\ status\_code\ \&\& \tabularnewline
+454 & 560 & \ 			get\_verb\ ==\ s->verb\ \&\&\ t->owner->cred\_acquire\_cb)\ \{ \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -747,6\ +853,11\ @@\ static\ void\ winhttp\_stream\_free(git\_smart\_subtransport\_stream\ *stream)} \tabularnewline
+747 & 853 & \ 		s->post\_body\ =\ NULL; \tabularnewline
+748 & 854 & \ 	\} \tabularnewline
+749 & 855 & \  \tabularnewline
+& 856 & \cellcolor{DiffInsertRGB} +	if\ (s->request\_uri)\ \{ \tabularnewline
+& 857 & \cellcolor{DiffInsertRGB} +		git\_\_free(s->request\_uri); \tabularnewline
+& 858 & \cellcolor{DiffInsertRGB} +		s->request\_uri\ =\ NULL; \tabularnewline
+& 859 & \cellcolor{DiffInsertRGB} +	\} \tabularnewline
+& 860 & \cellcolor{DiffInsertRGB} + \tabularnewline
+750 & 861 & \ 	if\ (s->request)\ \{ \tabularnewline
+751 & 862 & \ 		WinHttpCloseHandle(s->request); \tabularnewline
+752 & 863 & \ 		s->request\ =\ NULL; \tabularnewline
+... & ... & \textcolor{DiffLineNumber}{@@\ -876,7\ +987,7\ @@\ static\ int\ winhttp\_receivepack(} \tabularnewline
+876 & 987 & \ \{ \tabularnewline
+877 & 988 & \ 	/*\ WinHTTP\ only\ supports\ Transfer-Encoding:\ chunked \tabularnewline
+878 & 989 & \ 	\ *\ on\ Windows\ Vista\ (NT\ 6.0)\ and\ higher.\ */ \tabularnewline
+879 & & \cellcolor{DiffDeleteRGB} -	s->chunked\ =\ LOBYTE(LOWORD(GetVersion()))\ >=\ 6; \tabularnewline
+& 990 & \cellcolor{DiffInsertRGB} +	s->chunked\ =\ git\_has\_win32\_version(6,\ 0); \tabularnewline
+880 & 991 & \  \tabularnewline
+881 & 992 & \ 	if\ (s->chunked) \tabularnewline
+882 & 993 & \ 		s->parent.write\ =\ winhttp\_stream\_write\_chunked; \tabularnewline
+
+\hline
+\end{longtabu}
+}
+
+\subsection{src/win32/error.c\label{sub:src/win32/error.c}}
+
+{\ttfamily\scriptsize
+
+\begin{longtabu} to \linewidth {|>{\color{DiffLineNumber}}r|>{\color{DiffLineNumber}}r|X|}
+
+\hline
+
+... & ... & \textcolor{DiffLineNumber}{@@\ -8,34\ +8,70\ @@} \tabularnewline
+8 & 8 & \ \#include\ \char`"\{\}common.h\char`"\{\} \tabularnewline
+9 & 9 & \ \#include\ \char`"\{\}error.h\char`"\{\} \tabularnewline
+10 & 10 & \  \tabularnewline
+& 11 & \cellcolor{DiffInsertRGB} +\#ifdef\ GIT\_WINHTTP \tabularnewline
+& 12 & \cellcolor{DiffInsertRGB} +\#\ include\ <winhttp.h> \tabularnewline
+& 13 & \cellcolor{DiffInsertRGB} +\#endif \tabularnewline
+& 14 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 15 & \cellcolor{DiffInsertRGB} +\#define\ WC\_ERR\_INVALID\_CHARS	0x80 \tabularnewline
+& 16 & \cellcolor{DiffInsertRGB} + \tabularnewline
+11 & 17 & \ char\ *git\_win32\_get\_error\_message(DWORD\ error\_code) \tabularnewline
+12 & 18 & \ \{ \tabularnewline
+13 & 19 & \ 	LPWSTR\ lpMsgBuf\ =\ NULL; \tabularnewline
+& 20 & \cellcolor{DiffInsertRGB} +	HMODULE\ hModule\ =\ NULL; \tabularnewline
+& 21 & \cellcolor{DiffInsertRGB} +	char\ *utf8\_msg\ =\ NULL; \tabularnewline
+& 22 & \cellcolor{DiffInsertRGB} +	int\ utf8\_size; \tabularnewline
+& 23 & \cellcolor{DiffInsertRGB} +	DWORD\ dwFlags\ = \tabularnewline
+& 24 & \cellcolor{DiffInsertRGB} +		FORMAT\_MESSAGE\_ALLOCATE\_BUFFER\ |\ FORMAT\_MESSAGE\_IGNORE\_INSERTS; \tabularnewline
+14 & 25 & \  \tabularnewline
+15 & 26 & \ 	if\ (!error\_code) \tabularnewline
+16 & 27 & \ 		return\ NULL; \tabularnewline
+17 & 28 & \  \tabularnewline
+18 & & \cellcolor{DiffDeleteRGB} -	if\ (FormatMessageW( \tabularnewline
+19 & & \cellcolor{DiffDeleteRGB} -				FORMAT\_MESSAGE\_ALLOCATE\_BUFFER\ | \tabularnewline
+20 & & \cellcolor{DiffDeleteRGB} -				FORMAT\_MESSAGE\_FROM\_SYSTEM\ | \tabularnewline
+21 & & \cellcolor{DiffDeleteRGB} -				FORMAT\_MESSAGE\_IGNORE\_INSERTS, \tabularnewline
+22 & & \cellcolor{DiffDeleteRGB} -				NULL,\ error\_code,\ MAKELANGID(LANG\_NEUTRAL,\ SUBLANG\_DEFAULT), \tabularnewline
+23 & & \cellcolor{DiffDeleteRGB} -				(LPWSTR)\&lpMsgBuf,\ 0,\ NULL))\ \{ \tabularnewline
+24 & & \cellcolor{DiffDeleteRGB} -		int\ utf8\_size\ =\ WideCharToMultiByte(CP\_UTF8,\ 0,\ lpMsgBuf,\ -1,\ NULL,\ 0,\ NULL,\ NULL); \tabularnewline
+25 & & \cellcolor{DiffDeleteRGB} - \tabularnewline
+26 & & \cellcolor{DiffDeleteRGB} -		char\ *lpMsgBuf\_utf8\ =\ git\_\_malloc(utf8\_size\ *\ sizeof(char)); \tabularnewline
+27 & & \cellcolor{DiffDeleteRGB} -		if\ (lpMsgBuf\_utf8\ ==\ NULL)\ \{ \tabularnewline
+28 & & \cellcolor{DiffDeleteRGB} -			LocalFree(lpMsgBuf); \tabularnewline
+29 & & \cellcolor{DiffDeleteRGB} -			return\ NULL; \tabularnewline
+& 29 & \cellcolor{DiffInsertRGB} +\#ifdef\ GIT\_WINHTTP \tabularnewline
+& 30 & \cellcolor{DiffInsertRGB} +	/*\ Errors\ raised\ by\ WinHTTP\ are\ not\ in\ the\ system\ resource\ table\ */ \tabularnewline
+& 31 & \cellcolor{DiffInsertRGB} +	if\ (error\_code\ >=\ WINHTTP\_ERROR\_BASE\ \&\& \tabularnewline
+& 32 & \cellcolor{DiffInsertRGB} +		error\_code\ <=\ WINHTTP\_ERROR\_LAST) \tabularnewline
+& 33 & \cellcolor{DiffInsertRGB} +		hModule\ =\ GetModuleHandleW(L\char`"\{\}winhttp\char`"\{\}); \tabularnewline
+& 34 & \cellcolor{DiffInsertRGB} +\#endif \tabularnewline
+& 35 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 36 & \cellcolor{DiffInsertRGB} +	GIT\_UNUSED(hModule); \tabularnewline
+& 37 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 38 & \cellcolor{DiffInsertRGB} +	if\ (hModule) \tabularnewline
+& 39 & \cellcolor{DiffInsertRGB} +		dwFlags\ |=\ FORMAT\_MESSAGE\_FROM\_HMODULE; \tabularnewline
+& 40 & \cellcolor{DiffInsertRGB} +	else \tabularnewline
+& 41 & \cellcolor{DiffInsertRGB} +		dwFlags\ |=\ FORMAT\_MESSAGE\_FROM\_SYSTEM; \tabularnewline
+& 42 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 43 & \cellcolor{DiffInsertRGB} +	if\ (FormatMessageW(dwFlags,\ hModule,\ error\_code, \tabularnewline
+& 44 & \cellcolor{DiffInsertRGB} +		MAKELANGID(LANG\_NEUTRAL,\ SUBLANG\_DEFAULT), \tabularnewline
+& 45 & \cellcolor{DiffInsertRGB} +		(LPWSTR)\&lpMsgBuf,\ 0,\ NULL))\ \{ \tabularnewline
+& 46 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 47 & \cellcolor{DiffInsertRGB} +		/*\ Invalid\ code\ point\ check\ supported\ on\ Vista+\ only\ */ \tabularnewline
+& 48 & \cellcolor{DiffInsertRGB} +		if\ (git\_has\_win32\_version(6,\ 0)) \tabularnewline
+& 49 & \cellcolor{DiffInsertRGB} +			dwFlags\ =\ WC\_ERR\_INVALID\_CHARS; \tabularnewline
+& 50 & \cellcolor{DiffInsertRGB} +		else \tabularnewline
+& 51 & \cellcolor{DiffInsertRGB} +			dwFlags\ =\ 0; \tabularnewline
+& 52 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 53 & \cellcolor{DiffInsertRGB} +		utf8\_size\ =\ WideCharToMultiByte(CP\_UTF8,\ dwFlags, \tabularnewline
+& 54 & \cellcolor{DiffInsertRGB} +			lpMsgBuf,\ -1,\ NULL,\ 0,\ NULL,\ NULL); \tabularnewline
+& 55 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 56 & \cellcolor{DiffInsertRGB} +		if\ (!utf8\_size)\ \{ \tabularnewline
+& 57 & \cellcolor{DiffInsertRGB} +			assert(0); \tabularnewline
+& 58 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+30 & 59 & \ 		\} \tabularnewline
+31 & & \cellcolor{DiffDeleteRGB} -		if\ (!WideCharToMultiByte(CP\_UTF8,\ 0,\ lpMsgBuf,\ -1,\ lpMsgBuf\_utf8,\ utf8\_size,\ NULL,\ NULL))\ \{ \tabularnewline
+32 & & \cellcolor{DiffDeleteRGB} -			LocalFree(lpMsgBuf); \tabularnewline
+33 & & \cellcolor{DiffDeleteRGB} -			git\_\_free(lpMsgBuf\_utf8); \tabularnewline
+34 & & \cellcolor{DiffDeleteRGB} -			return\ NULL; \tabularnewline
+& 60 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 61 & \cellcolor{DiffInsertRGB} +		utf8\_msg\ =\ git\_\_malloc(utf8\_size); \tabularnewline
+& 62 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 63 & \cellcolor{DiffInsertRGB} +		if\ (!utf8\_msg) \tabularnewline
+& 64 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+& 65 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 66 & \cellcolor{DiffInsertRGB} +		if\ (!WideCharToMultiByte(CP\_UTF8,\ dwFlags, \tabularnewline
+& 67 & \cellcolor{DiffInsertRGB} +			lpMsgBuf,\ -1,\ utf8\_msg,\ utf8\_size,\ NULL,\ NULL))\ \{ \tabularnewline
+& 68 & \cellcolor{DiffInsertRGB} +			git\_\_free(utf8\_msg); \tabularnewline
+& 69 & \cellcolor{DiffInsertRGB} +			goto\ on\_error; \tabularnewline
+35 & 70 & \ 		\} \tabularnewline
+36 & 71 & \  \tabularnewline
+& 72 & \cellcolor{DiffInsertRGB} +on\_error: \tabularnewline
+37 & 73 & \ 		LocalFree(lpMsgBuf); \tabularnewline
+38 & & \cellcolor{DiffDeleteRGB} -		return\ lpMsgBuf\_utf8; \tabularnewline
+39 & 74 & \ 	\} \tabularnewline
+40 & & \cellcolor{DiffDeleteRGB} -	return\ NULL; \tabularnewline
+& 75 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 76 & \cellcolor{DiffInsertRGB} +	return\ utf8\_msg; \tabularnewline
+41 & 77 & \ \} \tabularnewline
+
+\hline
+\end{longtabu}
+}
+
+\subsection{src/win32/version.h\label{sub:src/win32/version.h}}
+
+{\ttfamily\scriptsize
+
+\begin{longtabu} to \linewidth {|>{\color{DiffLineNumber}}r|>{\color{DiffLineNumber}}r|X|}
+
+\hline
+
+... & ... & \textcolor{DiffLineNumber}{@@\ -0,0\ +1,20\ @@} \tabularnewline
+& 1 & \cellcolor{DiffInsertRGB} +/* \tabularnewline
+& 2 & \cellcolor{DiffInsertRGB} +\ *\ Copyright\ (C)\ the\ libgit2\ contributors.\ All\ rights\ reserved. \tabularnewline
+& 3 & \cellcolor{DiffInsertRGB} +\ * \tabularnewline
+& 4 & \cellcolor{DiffInsertRGB} +\ *\ This\ file\ is\ part\ of\ libgit2,\ distributed\ under\ the\ GNU\ GPL\ v2\ with \tabularnewline
+& 5 & \cellcolor{DiffInsertRGB} +\ *\ a\ Linking\ Exception.\ For\ full\ terms\ see\ the\ included\ COPYING\ file. \tabularnewline
+& 6 & \cellcolor{DiffInsertRGB} +\ */ \tabularnewline
+& 7 & \cellcolor{DiffInsertRGB} +\#ifndef\ INCLUDE\_win32\_version\_h\_\_ \tabularnewline
+& 8 & \cellcolor{DiffInsertRGB} +\#define\ INCLUDE\_win32\_version\_h\_\_ \tabularnewline
+& 9 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 10 & \cellcolor{DiffInsertRGB} +\#include\ <windows.h> \tabularnewline
+& 11 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 12 & \cellcolor{DiffInsertRGB} +GIT\_INLINE(int)\ git\_has\_win32\_version(int\ major,\ int\ minor) \tabularnewline
+& 13 & \cellcolor{DiffInsertRGB} +\{ \tabularnewline
+& 14 & \cellcolor{DiffInsertRGB} +	WORD\ wVersion\ =\ LOWORD(GetVersion()); \tabularnewline
+& 15 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 16 & \cellcolor{DiffInsertRGB} +	return\ LOBYTE(wVersion)\ >\ major\ || \tabularnewline
+& 17 & \cellcolor{DiffInsertRGB} +		(LOBYTE(wVersion)\ ==\ major\ \&\&\ HIBYTE(wVersion)\ >=\ minor); \tabularnewline
+& 18 & \cellcolor{DiffInsertRGB} +\} \tabularnewline
+& 19 & \cellcolor{DiffInsertRGB} + \tabularnewline
+& 20 & \cellcolor{DiffInsertRGB} +\#endif \tabularnewline
+
+\hline
+\end{longtabu}
+}
