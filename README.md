@@ -44,7 +44,7 @@ and then input the diff
 Example
 =======
 
-Here is a small example for a libgit2 [commit](https://github.com/libgit2/libgit2/commit/08283cbdb857d09f8e623c5c23abcaa499b6b3fc) see below for a preview of the [pdf](/example/parent.pdf)
+Here is a small example for a libgit2 [commit](https://github.com/libgit2/libgit2/commit/08283cbdb857d09f8e623c5c23abcaa499b6b3fc) -- below is a preview of the [pdf](/example/parent.pdf)
 
 ![examplepng](/example/example.png)
 
