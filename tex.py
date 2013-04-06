@@ -49,8 +49,7 @@ latexReplacements = {
     '{': '\\{',
     '}': '\\}',
     '~': '\\textasciitilde ',
-    '^': '\\textasciicircum ',
-    '"': '\char`\"{}'
+    '^': '\\textasciicircum '
 }
 
 def escapeForLatex(text):
@@ -60,6 +59,8 @@ def escapeForLatex(text):
 
     for i, j in latexReplacements.items():
         text = text.replace(i, j)
+
+    text = text.replace('"', '\char`\"{}')
     return text
 
 def output(files, settings):
