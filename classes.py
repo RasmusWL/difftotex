@@ -21,6 +21,7 @@ class DiffFile():
         self.newPath = None
         self.pathChanged = False
         self.changes = []
+        self.diffLine = None
 
 class Settings():
     headingStyle = None
@@ -28,3 +29,6 @@ class Settings():
     shouldAddLabel = None
     outfile = None
     diffPrefixRegex = None
+    quiet = None
+
+settings = Settings()

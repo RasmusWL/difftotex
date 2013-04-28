@@ -68,9 +68,11 @@ parser.add_argument('--diff-path-regex', dest='diffPrefixRegex', metavar="RE",
                     git diff will by default prefix old with "a/" and
                     new with "b/". (default: {})""".format(defaultDiffPrefixRegex) )
 
-def parse_cli():
-    settings = Settings()
+parser.add_argument('-q', '--quiet', dest='quiet', action="store_const",
+                    const=True, default=False,
+                    help="don't print messages")
 
+def parse_cli():
     args = parser.parse_args()
 
     if args.outfile is None:
@@ -110,4 +112,6 @@ def parse_cli():
     else:
         inputLines = sys.stdin.read().splitlines()
 
-    return (inputLines, settings)
+    settings.quiet = args.quiet
+
+    return (inputLines)

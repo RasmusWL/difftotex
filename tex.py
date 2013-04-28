@@ -63,7 +63,7 @@ def escapeForLatex(text):
     text = text.replace('"', '\char`\"{}')
     return text
 
-def output(files, settings):
+def output(files):
     outlines = []
 
     outlines.append(latexBegin)

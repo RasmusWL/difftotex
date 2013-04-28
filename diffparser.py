@@ -19,6 +19,13 @@ def parseDiffLine(line):
 def transformFilename(filename, regex):
     return ( re.sub(regex, "", filename) )
 
+def hackRemoveNonValid(diffFiles):
+    for diffFile in diffFiles:
+        if diffFile.changes == []:
+            if not settings.quiet:
+                print ( "Removing invalid input: %s" % (diffFile.diffLine) )
+            diffFiles.remove(diffFile)
+
 def parseLines(lines, diffPrefixRegex):
     diffFiles = []
     diffFile = None
@@ -29,6 +36,7 @@ def parseLines(lines, diffPrefixRegex):
         if line.startswith("diff"):
             diffFile = DiffFile()
             diffFiles.append(diffFile)
+            diffFile.diffLine = line
 
         elif line.startswith("@@"):
             oldStartLine = int( line[ line.find("-")+1:line.find(",")] )
@@ -54,5 +62,7 @@ def parseLines(lines, diffPrefixRegex):
             if ( diffLine is None):
                 continue
             change.lines.append( diffLine )
+
+    hackRemoveNonValid(diffFiles);
 
     return diffFiles
