@@ -1,4 +1,4 @@
-#!/usr/bin/python3.2
+#!/usr/bin/python3
 
 import tex, diffparser, argumentparser
 from classes import *
