@@ -20,7 +20,9 @@ def transformFilename(filename, regex):
     return ( re.sub(regex, "", filename) )
 
 def hackRemoveNonValid(diffFiles):
-    for diffFile in diffFiles:
+    # Iterate backwards, as forward iteration does not handle removing items
+    for diffFile in reversed(diffFiles):
+        #diffFile = diffFiles[i]
         if diffFile.changes == []:
             if not settings.quiet:
                 print ( "Removing invalid input: %s" % (diffFile.diffLine) )
