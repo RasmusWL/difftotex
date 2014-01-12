@@ -1,6 +1,8 @@
 import re
 from classes import *
 
+getLinesNumsRE = re.compile(r'@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@')
+
 def parseDiffLine(line):
     diffLine = DiffLine()
 
@@ -33,37 +35,43 @@ def parseLines(lines, diffPrefixRegex):
     diffFile = None
     change = None
 
-    for line in lines:
+    lineNum = 0
 
-        if line.startswith("diff"):
-            diffFile = DiffFile()
-            diffFiles.append(diffFile)
-            diffFile.diffLine = line
+    try:
+        for line in lines:
+            lineNum += 1
 
-        elif line.startswith("@@"):
-            oldStartLine = int( line[ line.find("-")+1:line.find(",")] )
-            newStartLine = int( line[ line.find("+")+1:line.find(",", line.find("+"))] )
+            if line.startswith("diff"):
+                diffFile = DiffFile()
+                diffFiles.append(diffFile)
+                diffFile.diffLine += line
 
-            change = DiffChange()
-            diffFile.changes.append(change)
+            elif line.startswith("@@"):
+                (oldStr, newStr) = getLinesNumsRE.match(line).groups()
 
-            change.oldStartLine = oldStartLine
-            change.newStartLine = newStartLine
-            change.description = line
+                change = DiffChange()
+                diffFile.changes.append(change)
 
-        elif line.startswith("---"):
-            diffFile.oldPath = transformFilename(line[4:], diffPrefixRegex)
+                change.oldStartLine = int(oldStr)
+                change.newStartLine = int(newStr)
+                change.description = line
 
-        elif line.startswith("+++"):
-            diffFile.newPath = transformFilename(line[4:], diffPrefixRegex)
+            elif line.startswith("---"):
+                diffFile.oldPath = transformFilename(line[4:], diffPrefixRegex)
 
-            diffFile.pathChanged = diffFile.newPath != diffFile.oldPath
+            elif line.startswith("+++"):
+                diffFile.newPath = transformFilename(line[4:], diffPrefixRegex)
 
-        else:
-            diffLine = parseDiffLine(line)
-            if ( diffLine is None):
-                continue
-            change.lines.append( diffLine )
+                diffFile.pathChanged = diffFile.newPath != diffFile.oldPath
+
+            else:
+                diffLine = parseDiffLine(line)
+                if ( diffLine is None):
+                    continue
+                change.lines.append( diffLine )
+    except Exception as e:
+        raise ParseError(lineNum, e)
+
 
     hackRemoveNonValid(diffFiles);
 

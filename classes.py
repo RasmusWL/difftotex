@@ -32,3 +32,16 @@ class Settings():
     quiet = None
 
 settings = Settings()
+
+class ParseError(Exception):
+    def __init__(self, lineNum, e):
+        self.lineNum = lineNum
+        self.e = e
+    def __str__(self):
+        return ("An error occurred while parsing your diff file at line %d" % self.lineNum)
+
+class ToTexError(Exception):
+    def __init__(self, e):
+        self.e = e
+    def __str__(self):
+        return ("An error occurred while converting your diff to TeX")

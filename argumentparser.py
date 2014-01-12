@@ -2,8 +2,7 @@ import argparse
 import os, sys
 
 from classes import *
-
-version = "0.1.0"
+from difftotex import version
 
 description = """\
 Create latex from git diff supplied in FILE or standard input.
@@ -31,7 +30,7 @@ mapping = {
 "par":"paragraph"
 }
 
-sectionChoices = ["part", "sub", "subsub", "par"]
+sectionChoices = ["part", "sec", "sub", "subsub", "par"]
 
 parser = argparse.ArgumentParser(usage='%(prog)s [OPTION ...] [FILE]', description=description, epilog=epilog,
                                 formatter_class=argparse.RawDescriptionHelpFormatter,)
