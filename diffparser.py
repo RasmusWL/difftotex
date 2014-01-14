@@ -44,7 +44,7 @@ def parseLines(lines, diffPrefixRegex):
             if line.startswith("diff"):
                 diffFile = DiffFile()
                 diffFiles.append(diffFile)
-                diffFile.diffLine += line
+                diffFile.diffLine = line
 
             elif line.startswith("@@"):
                 (oldStr, newStr) = getLinesNumsRE.match(line).groups()
